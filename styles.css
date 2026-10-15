@@ -219,17 +219,41 @@ h1 {
 .timeline p { margin: 2px 0 0; color: var(--muted); }
 
 /* ---------- Skills ---------- */
-.query {
-  border: 1px solid var(--line); border-radius: 14px; background: var(--bg-soft);
-  padding: 22px 24px; max-width: 560px;
+.q { font-size: 0.92rem; color: var(--muted); margin: 0 0 28px; }
+.q .kw { color: var(--accent); }
+.tier { font-size: 0.8rem; font-weight: 500; color: var(--muted); margin: 0 0 12px; }
+.skills { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+.skills.adv-row { grid-template-columns: repeat(2, 1fr); }
+.skill {
+  position: relative; overflow: hidden;
+  border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px;
+  background: var(--bg-soft);
+  transition: border-color 0.2s, transform 0.2s;
 }
-.query .q { margin: 0 0 16px; font-size: 0.92rem; }
-.query .kw { color: var(--accent); }
-.query table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-.query th { text-align: left; color: var(--muted); font-weight: 400; border-bottom: 1px solid var(--line); padding: 6px 0; }
-.query td { padding: 7px 0; border-bottom: 1px dashed var(--line); }
-.query td:last-child, .query th:last-child { color: var(--muted); text-align: right; }
-.query .rows { margin: 14px 0 0; color: var(--muted); font-size: 0.8rem; }
+.skill:hover { border-color: var(--accent); transform: translateY(-2px); }
+.skill.adv { border-color: var(--accent); background: linear-gradient(135deg, var(--accent-soft), transparent 70%), var(--bg-soft); padding: 26px 26px 24px; }
+.skill-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.skill .badge {
+  display: inline-grid; place-items: center; min-width: 40px; height: 40px; padding: 0 8px; border-radius: 10px;
+  background: var(--accent-soft); color: var(--accent); font-weight: 500; font-size: 0.9rem;
+}
+.skill.adv .badge { background: var(--accent); color: #fff; min-width: 48px; height: 48px; font-size: 1rem; }
+.skill .level { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.skill.adv .level { color: var(--accent); }
+.skill h3 { margin: 0; font-size: 1.1rem; letter-spacing: -0.01em; }
+.skill.adv h3 { font-size: 1.45rem; }
+.skill .area { margin: 2px 0 16px; font-size: 0.78rem; color: var(--muted); }
+.meter { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.meter span { height: 6px; border-radius: 99px; background: var(--line); }
+.meter span.on { background: var(--accent); }
+.also { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.also > span { font-size: 0.8rem; color: var(--muted); }
+.also .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.also .chips li { font-size: 0.85rem; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg-soft); }
+@media (max-width: 760px) {
+  .skills, .skills.adv-row { grid-template-columns: 1fr; }
+  .q { font-size: 0.8rem; }
+}
 
 /* ---------- Projects ---------- */
 .projects { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
