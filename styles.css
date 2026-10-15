@@ -308,3 +308,15 @@ a.project:hover { border-color: var(--accent); transform: translateY(-2px); }
   .contact-grid { grid-template-columns: 1fr; gap: 28px; }
   #map .route.online { stroke-width: 2.6; stroke-dasharray: 8 9; }
 }
+
+/* ---------- Interest card extras ---------- */
+.card .bat { width: 22px; height: 11px; fill: currentColor; }
+.card .list { margin: 0; padding: 0; list-style: none; color: var(--muted); font-size: 0.92rem; }
+.card .list li { padding: 2px 0 2px 14px; position: relative; }
+.card .list li::before { content: "›"; position: absolute; left: 0; color: var(--accent); }
+.card.wide { grid-column: 1 / -1; }
+.card .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 0; padding: 0; list-style: none; }
+.card .chips li {
+  font-size: 0.85rem; padding: 4px 12px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--text);
+}
