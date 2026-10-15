@@ -16,7 +16,7 @@ const PROJECTS = [];
 // messages sent to, then paste it here. The key is safe to publish:
 // it can only send mail to that one address.
 // ---------------------------------------------------------------
-const WEB3FORMS_KEY = "";
+const WEB3FORMS_KEY = "fd03126d-c203-4f02-8862-bec3d096bbbb";
 
 const root = document.documentElement;
 
