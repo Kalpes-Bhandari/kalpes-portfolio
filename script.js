@@ -172,9 +172,13 @@ document.getElementById("year").textContent = new Date().getFullYear();
   });
 })();
 
+// Which hero animation to show. The atom is the default; add ?hero=planet to the URL for the planet concept.
+const HERO_MODE = new URLSearchParams(location.search).get("hero") === "planet" ? "planet" : "atom";
+
 // ---------- Atom (hero) ----------
 // A 3D nucleus of protons and neutrons with electrons on tilted orbits.
 (function atom() {
+  if (HERO_MODE !== "atom") return;
   const canvas = document.getElementById("atom");
   const ctx = canvas.getContext("2d");
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -309,6 +313,162 @@ document.getElementById("year").textContent = new Date().getFullYear();
   window.redrawHero = () => { if (!running) draw(2000); };
   window.addEventListener("resize", () => { size(); if (!running) draw(2000); });
   // Only animate while the hero is on screen.
+  new IntersectionObserver((e) => (e[0].isIntersecting ? start() : stop())).observe(canvas);
+})();
+
+// ---------- Planet (hero concept: open the site with ?hero=planet) ----------
+// A shaded, slowly spinning planet with math, science and data symbols orbiting it.
+(function planet() {
+  if (HERO_MODE !== "planet") return;
+  const canvas = document.getElementById("atom");
+  const ctx = canvas.getContext("2d");
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const css = (name) => getComputedStyle(root).getPropertyValue(name).trim();
+
+  const rotX = (p, a) => [p[0], p[1] * Math.cos(a) - p[2] * Math.sin(a), p[1] * Math.sin(a) + p[2] * Math.cos(a)];
+  const rotY = (p, a) => [p[0] * Math.cos(a) + p[2] * Math.sin(a), p[1], -p[0] * Math.sin(a) + p[2] * Math.cos(a)];
+  const rotZ = (p, a) => [p[0] * Math.cos(a) - p[1] * Math.sin(a), p[0] * Math.sin(a) + p[1] * Math.cos(a), p[2]];
+
+  // Each orbit carries a themed set of symbols.
+  const orbits = [
+    { tiltX: 1.2, tiltZ: 0.35, r: 1.0, speed: 0.32, symbols: ["∑", "∫", "π", "√", "∞"] },          // math
+    { tiltX: 1.2, tiltZ: 2.45, r: 0.86, speed: -0.42, symbols: ["ψ", "ℏ", "E=mc²", "∇", "Δ"] },     // physics
+    { tiltX: 1.2, tiltZ: 4.3, r: 0.93, speed: 0.38, symbols: ["SQL", "{ }", "01", "σ", "λ"] },      // data
+  ];
+
+  let W = 0, H = 0;
+  function size() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    W = rect.width; H = rect.height;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  const project = (p, R) => { const s = 4 / (4 + p[2]); return [W / 2 + p[0] * R * s, H / 2 + p[1] * R * s, s]; };
+  function orbitPoint(o, t, spin) {
+    let p = [Math.cos(t) * o.r, Math.sin(t) * o.r, 0];
+    p = rotZ(rotX(p, o.tiltX), o.tiltZ);
+    return rotY(p, spin);
+  }
+
+  function draw(time) {
+    const accent = css("--accent"), text = css("--text"), bg = css("--bg");
+    const dark = root.getAttribute("data-theme") === "dark";
+    const R = Math.min(W, H) * 0.44;
+    const Rp = R * 0.36;
+    const spin = time * 0.00008;
+    ctx.clearRect(0, 0, W, H);
+
+    // Orbit paths split into back / front halves.
+    const back = [], front = [];
+    orbits.forEach((o) => {
+      const N = 150;
+      for (let i = 0; i < N; i++) {
+        const a = orbitPoint(o, (i / N) * Math.PI * 2, spin), b = orbitPoint(o, ((i + 1) / N) * Math.PI * 2, spin);
+        ((a[2] + b[2]) / 2 > 0 ? back : front).push([project(a, R), project(b, R)]);
+      }
+    });
+    const strokeSegs = (list, alpha) => {
+      ctx.strokeStyle = accent; ctx.globalAlpha = alpha; ctx.lineWidth = 1;
+      ctx.setLineDash([2, 5]);
+      ctx.beginPath();
+      list.forEach(([a, b]) => { ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); });
+      ctx.stroke();
+      ctx.setLineDash([]);
+    };
+
+    // Symbols.
+    const syms = [];
+    orbits.forEach((o, oi) => o.symbols.forEach((ch, i) => {
+      const t = time * 0.001 * o.speed + (i / o.symbols.length) * Math.PI * 2 + oi * 0.7;
+      syms.push({ ch, p: orbitPoint(o, t, spin), data: oi === 2 });
+    }));
+    function drawSym({ ch, p, data }) {
+      const [x, y, s] = project(p, R);
+      const behind = p[2] > 0;
+      const fs = Math.max(12, R * 0.1) * s * (ch.length > 2 ? 0.75 : 1);
+      ctx.font = `600 ${fs}px "JetBrains Mono", monospace`;
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      // Small pill behind each symbol so it reads over the orbit lines.
+      const w = ctx.measureText(ch).width + fs * 0.7, h = fs * 1.35;
+      ctx.globalAlpha = behind ? 0.35 : 1;
+      ctx.fillStyle = bg;
+      ctx.strokeStyle = accent; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.roundRect(x - w / 2, y - h / 2, w, h, h / 2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = data ? text : accent;
+      if (!behind) { ctx.shadowColor = accent; ctx.shadowBlur = 10; }
+      ctx.fillText(ch, x, y + fs * 0.04);
+      ctx.shadowBlur = 0;
+    }
+
+    // Soft glow behind everything.
+    ctx.globalAlpha = 1;
+    const halo = ctx.createRadialGradient(W / 2, H / 2, Rp * 0.8, W / 2, H / 2, R * 1.15);
+    halo.addColorStop(0, accent + "26"); halo.addColorStop(1, accent + "00");
+    ctx.fillStyle = halo; ctx.fillRect(0, 0, W, H);
+
+    strokeSegs(back, 0.25);
+    syms.filter((s) => s.p[2] > 0).sort((a, b) => b.p[2] - a.p[2]).forEach(drawSym);
+
+    // Planet body: lit from the upper left.
+    const cx = W / 2, cy = H / 2;
+    const body = ctx.createRadialGradient(cx - Rp * 0.4, cy - Rp * 0.45, Rp * 0.05, cx, cy, Rp);
+    body.addColorStop(0, dark ? "#ff8a8c" : "#7fa2ff");
+    body.addColorStop(0.45, accent);
+    body.addColorStop(1, dark ? "#3a0b0c" : "#0b2a7a");
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = body;
+    ctx.beginPath(); ctx.arc(cx, cy, Rp, 0, Math.PI * 2); ctx.fill();
+
+    // Latitude / longitude grid on the visible hemisphere, tilted and spinning.
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx, cy, Rp, 0, Math.PI * 2); ctx.clip();
+    ctx.strokeStyle = "#ffffff"; ctx.globalAlpha = 0.35; ctx.lineWidth = 0.9;
+    const tilt = -0.4, gspin = time * 0.00035;
+    const sp = (lat, lon) => rotX(rotY([Math.cos(lat) * Math.sin(lon), Math.sin(lat), Math.cos(lat) * Math.cos(lon)], gspin), tilt);
+    ctx.beginPath();
+    for (let m = 0; m < 12; m++) {
+      const lon = (m / 12) * Math.PI * 2;
+      for (let k = 0; k < 40; k++) {
+        const a = sp(-Math.PI / 2 + (k / 40) * Math.PI, lon), b = sp(-Math.PI / 2 + ((k + 1) / 40) * Math.PI, lon);
+        if (a[2] < 0 || b[2] < 0) continue;
+        ctx.moveTo(cx + a[0] * Rp, cy + a[1] * Rp); ctx.lineTo(cx + b[0] * Rp, cy + b[1] * Rp);
+      }
+    }
+    for (let l = -2; l <= 2; l++) {
+      const lat = l * (Math.PI / 6);
+      for (let k = 0; k < 60; k++) {
+        const a = sp(lat, (k / 60) * Math.PI * 2), b = sp(lat, ((k + 1) / 60) * Math.PI * 2);
+        if (a[2] < 0 || b[2] < 0) continue;
+        ctx.moveTo(cx + a[0] * Rp, cy + a[1] * Rp); ctx.lineTo(cx + b[0] * Rp, cy + b[1] * Rp);
+      }
+    }
+    ctx.stroke();
+    // Night-side shading.
+    const shade = ctx.createRadialGradient(cx - Rp * 0.5, cy - Rp * 0.5, Rp * 0.6, cx, cy, Rp * 1.25);
+    shade.addColorStop(0, "rgba(0,0,0,0)"); shade.addColorStop(1, "rgba(0,0,0,0.45)");
+    ctx.globalAlpha = 1; ctx.fillStyle = shade; ctx.fillRect(cx - Rp, cy - Rp, Rp * 2, Rp * 2);
+    ctx.restore();
+
+    // Thin atmosphere rim.
+    ctx.globalAlpha = 0.6; ctx.strokeStyle = accent; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(cx, cy, Rp + 2, 0, Math.PI * 2); ctx.stroke();
+
+    strokeSegs(front, 0.55);
+    syms.filter((s) => s.p[2] <= 0).sort((a, b) => b.p[2] - a.p[2]).forEach(drawSym);
+    ctx.globalAlpha = 1;
+  }
+
+  let running = false, raf = null;
+  function frame(t) { draw(t); if (running) raf = requestAnimationFrame(frame); }
+  function start() { if (running || reduce) return; running = true; raf = requestAnimationFrame(frame); }
+  function stop() { running = false; cancelAnimationFrame(raf); }
+
+  size();
+  draw(2000);
+  window.redrawHero = () => { if (!running) draw(2000); };
+  window.addEventListener("resize", () => { size(); if (!running) draw(2000); });
+  document.fonts.ready.then(() => { if (!running) draw(2000); });
   new IntersectionObserver((e) => (e[0].isIntersecting ? start() : stop())).observe(canvas);
 })();
 
