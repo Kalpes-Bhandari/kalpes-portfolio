@@ -172,10 +172,10 @@ document.getElementById("year").textContent = new Date().getFullYear();
   });
 })();
 
-// Which hero animation to show. The atom is the default; add ?hero=planet to the URL for the planet concept.
-const HERO_MODE = new URLSearchParams(location.search).get("hero") === "planet" ? "planet" : "atom";
+// Which hero animation to show. The planet is the default; add ?hero=atom to the URL for the atom.
+const HERO_MODE = new URLSearchParams(location.search).get("hero") === "atom" ? "atom" : "planet";
 
-// ---------- Atom (hero) ----------
+// ---------- Atom (alternate hero: open the site with ?hero=atom) ----------
 // A 3D nucleus of protons and neutrons with electrons on tilted orbits.
 (function atom() {
   if (HERO_MODE !== "atom") return;
@@ -316,7 +316,7 @@ const HERO_MODE = new URLSearchParams(location.search).get("hero") === "planet" 
   new IntersectionObserver((e) => (e[0].isIntersecting ? start() : stop())).observe(canvas);
 })();
 
-// ---------- Planet (hero concept: open the site with ?hero=planet) ----------
+// ---------- Planet (hero) ----------
 // A shaded, slowly spinning planet with math, science and data symbols orbiting it.
 (function planet() {
   if (HERO_MODE !== "planet") return;
