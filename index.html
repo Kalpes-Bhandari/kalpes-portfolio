@@ -44,6 +44,7 @@
     <nav class="tabs" aria-label="Sections">
       <a href="#about">About</a>
       <a href="#journey">Journey</a>
+      <a href="#interests">Interests</a>
       <a href="#skills">Skills</a>
       <a href="#projects">Projects</a>
       <a href="#contact">Contact</a>
@@ -77,18 +78,18 @@
         <div class="prose">
           <p>I was born in Goldhap, Jhapa, Nepal, to Bhutanese-Nepali parents. In 2009 my family came to the United States as refugees and settled in Des Moines, Iowa.</p>
           <p>I studied Management Information Systems at Iowa State University, where I got hooked on data — not just the numbers, but how good data quietly powers every other part of a business. Today I live in the Harrisburg, Pennsylvania area, work full-time as a <strong>data engineer</strong>, and study for a master's in analytics (OMSA) online at <strong>Georgia Tech</strong>.</p>
-          <p>I've always wanted to be a polymath. Physics and math pull me in the most, but I like learning a little about everything.</p>
+          <p>I've always wanted to be a polymath. Physics and math pull me in the most, but I like learning a little about everything — more on that under <a href="#interests">Interests</a>.</p>
         </div>
-        <aside class="interests">
-          <p class="mono label">interests = {</p>
-          <ul>
-            <li><span class="sym">∂</span> Physics</li>
-            <li><span class="sym">∑</span> Mathematics</li>
-            <li><span class="sym">●</span> Basketball</li>
-            <li><span class="sym">◎</span> Soccer</li>
-            <li><span class="sym">🦇</span> Batman &amp; superheroes</li>
-          </ul>
-          <p class="mono label">}</p>
+        <aside class="facts mono">
+          <p class="label">kalpes = {</p>
+          <dl>
+            <div><dt>from</dt><dd>"Jhapa, Nepal"</dd></div>
+            <div><dt>home</dt><dd>"Harrisburg, PA"</dd></div>
+            <div><dt>role</dt><dd>"Data Engineer"</dd></div>
+            <div><dt>study</dt><dd>"OMSA @ Georgia Tech"</dd></div>
+            <div><dt>fuel</dt><dd>"chai"</dd></div>
+          </dl>
+          <p class="label">}</p>
         </aside>
       </div>
     </section>
@@ -108,9 +109,74 @@
       </ol>
     </section>
 
+    <!-- INTERESTS -->
+    <section id="interests" class="section">
+      <h2><span class="num mono">03</span> Interests</h2>
+
+      <div class="feature">
+        <div class="prose">
+          <p class="eyebrow mono">// the kid who wanted to be a physicist</p>
+          <p>Growing up, I wanted to be a physicist. <em>Cosmos: A Spacetime Odyssey</em> blew my mind, and <em>Bill Nye the Science Guy</em> made science feel like the most fun thing in the world. I still think like that kid — I just point the curiosity at data now.</p>
+          <p>Along the way a few scientists became my heroes, and their books stayed with me.</p>
+        </div>
+        <div class="heroes">
+          <article class="hero-card star">
+            <span class="tag mono">★ favorite scientist ever</span>
+            <h3>Michael Faraday</h3>
+            <p>Grew up poor, had almost no formal schooling, and still became one of the most influential scientists in history. His story of pushing through hardship is the one I come back to most.</p>
+          </article>
+          <article class="hero-card">
+            <h3>Richard Feynman</h3>
+            <p class="mono book">📖 Surely You're Joking, Mr. Feynman!</p>
+          </article>
+          <article class="hero-card">
+            <h3>Randy Pausch</h3>
+            <p class="mono book">📖 The Last Lecture</p>
+          </article>
+          <article class="hero-card">
+            <h3>Neil deGrasse Tyson</h3>
+            <p class="mono book">📖 Astrophysics for People in a Hurry</p>
+          </article>
+        </div>
+      </div>
+
+      <div class="cards">
+        <article class="card">
+          <span class="icon">⚽</span>
+          <h3>Football</h3>
+          <p>Real Madrid fan. Cristiano Ronaldo, Mesut Özil, and Luka Modrić were my guys.</p>
+        </article>
+        <article class="card">
+          <span class="icon">🏀</span>
+          <h3>Basketball</h3>
+          <p>Playing it, watching it, talking about it.</p>
+        </article>
+        <article class="card">
+          <span class="icon">✎</span>
+          <h3>Writing</h3>
+          <p>I've written poems, but essays are where I really like to think things through.</p>
+        </article>
+        <article class="card">
+          <span class="icon">☕</span>
+          <h3>Chai</h3>
+          <p class="mono eq">chai = tea + milk + masala + time</p>
+        </article>
+        <article class="card">
+          <span class="icon">🦇</span>
+          <h3>Batman &amp; superheroes</h3>
+          <p>No powers, just discipline and preparation. That's the appeal.</p>
+        </article>
+        <article class="card">
+          <span class="icon">∑</span>
+          <h3>Math &amp; physics</h3>
+          <p>The long goal: keep learning across fields and become a real polymath.</p>
+        </article>
+      </div>
+    </section>
+
     <!-- SKILLS -->
     <section id="skills" class="section">
-      <h2><span class="num mono">03</span> Skills</h2>
+      <h2><span class="num mono">04</span> Skills</h2>
       <div class="query">
         <p class="mono q"><span class="kw">SELECT</span> skill, area <span class="kw">FROM</span> kalpes.toolkit;</p>
         <table class="mono">
@@ -131,13 +197,13 @@
 
     <!-- PROJECTS -->
     <section id="projects" class="section">
-      <h2><span class="num mono">04</span> Projects</h2>
+      <h2><span class="num mono">05</span> Projects</h2>
       <div id="projectList" class="projects"></div>
     </section>
 
     <!-- CONTACT -->
     <section id="contact" class="section contact">
-      <h2><span class="num mono">05</span> Contact</h2>
+      <h2><span class="num mono">06</span> Contact</h2>
       <div class="contact-grid">
         <div>
           <p class="prose">Have a question, an opportunity, or just want to talk data, physics, or basketball? Send me a message and it'll land in my inbox.</p>
