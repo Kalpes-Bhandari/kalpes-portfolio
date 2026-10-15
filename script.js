@@ -39,6 +39,48 @@ toggle.addEventListener("click", () => {
 
 const accent = () => getComputedStyle(root).getPropertyValue("--accent").trim();
 
+// ---------- Professional / Personal views ----------
+// Each view is its own area: only one is shown, so you can't scroll from one into the other.
+const viewEls = [...document.querySelectorAll(".view")];
+const viewLinks = [...document.querySelectorAll("[data-view-link]")];
+
+function viewFor(id) {
+  if (!id) return null;
+  const el = document.getElementById(id);
+  if (!el) return null;
+  if (el.classList.contains("view")) return el.dataset.view;
+  const parent = el.closest(".view");
+  return parent ? parent.dataset.view : null;
+}
+
+function showView(view) {
+  document.body.dataset.view = view;
+  viewLinks.forEach((a) => a.setAttribute("aria-selected", String(a.dataset.viewLink === view)));
+}
+
+function route(scroll) {
+  const id = location.hash.slice(1);
+  const view = viewFor(id);
+  showView(view || "professional");
+  if (!scroll || !view) return;
+  const target = document.getElementById(id);
+  // Wait a frame so the newly shown view has layout before scrolling to it.
+  requestAnimationFrame(() => target.scrollIntoView({ behavior: "smooth", block: "start" }));
+}
+
+document.addEventListener("click", (e) => {
+  const a = e.target.closest('a[href^="#"]');
+  if (!a) return;
+  const id = a.getAttribute("href").slice(1);
+  if (id === "top") { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+  if (!viewFor(id)) return;
+  e.preventDefault();
+  history.pushState(null, "", "#" + id);
+  route(true);
+});
+window.addEventListener("popstate", () => route(true));
+route(location.hash.length > 1);
+
 // ---------- Active tab while scrolling ----------
 const tabs = [...document.querySelectorAll(".tabs a")];
 const sections = tabs.map((a) => document.querySelector(a.getAttribute("href")));
@@ -214,10 +256,13 @@ document.getElementById("year").textContent = new Date().getFullYear();
   const projection = d3.geoNaturalEarth1().rotate([-8, 0]).fitExtent([[24, 24], [W - 24, H - 24]], frame);
   const path = d3.geoPath(projection);
 
-  svg.append("path").attr("class", "graticule").attr("d", path(d3.geoGraticule10()));
-  const landG = svg.append("g");
-  const routeG = svg.append("g");
-  const dotG = svg.append("g");
+  // Everything that zooms lives in one group.
+  const zoomG = svg.append("g");
+  zoomG.append("path").attr("class", "graticule").attr("d", path(d3.geoGraticule10()));
+  const landG = zoomG.append("g");
+  const statesG = zoomG.append("g");
+  const routeG = zoomG.append("g");
+  const dotG = zoomG.append("g");
 
   d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json").then((world) => {
     landG.append("path")
@@ -238,6 +283,7 @@ document.getElementById("year").textContent = new Date().getFullYear();
     const dots = places.map((p) => {
       const [px, py] = projection(p.coords);
       const g = dotG.append("g").attr("class", "place p" + places.indexOf(p)).attr("transform", `translate(${px},${py})`).style("opacity", 0);
+      g.datum([px, py]);
       g.append("circle").attr("class", "pulse").attr("r", 4);
       g.append("circle").attr("class", "dot").attr("r", 4);
       g.append("text").attr("class", "label").attr("x", p.dx).attr("y", p.dy).attr("text-anchor", p.anchor).text(p.name);
@@ -251,7 +297,8 @@ document.getElementById("year").textContent = new Date().getFullYear();
       routes.forEach((r, i) => {
         if (i === ONLINE_LEG) { r.style("opacity", reduce ? 1 : 0); return; }
         const len = r.node().getTotalLength();
-        r.attr("stroke-dasharray", `${len} ${len}`).attr("stroke-dashoffset", reduce ? 0 : len);
+        if (reduce) return;
+        r.attr("stroke-dasharray", `${len} ${len}`).attr("stroke-dashoffset", len);
       });
       if (reduce) { dots.forEach((d) => d.style("opacity", 1)); return; }
 
@@ -260,7 +307,9 @@ document.getElementById("year").textContent = new Date().getFullYear();
       legs.forEach(([, b], i) => {
         const dur = i === 0 ? 2200 : 900;
         const tr = routes[i].transition().delay(delay).duration(dur).ease(d3.easeCubicInOut);
-        i === ONLINE_LEG ? tr.style("opacity", 1) : tr.attr("stroke-dashoffset", 0);
+        // Drop the draw-on dash once done so the line stays solid when zoomed.
+        i === ONLINE_LEG ? tr.style("opacity", 1)
+          : tr.attr("stroke-dashoffset", 0).on("end", () => routes[i].attr("stroke-dasharray", null).attr("stroke-dashoffset", null));
         dots[b].transition().delay(delay + dur - 100).duration(400).style("opacity", 1);
         delay += dur + 150;
       });
@@ -273,6 +322,64 @@ document.getElementById("year").textContent = new Date().getFullYear();
           .on("end", () => { delay = 0; loop(); });
       })();
     }
+
+    // ---------- Zoom & pan ----------
+    const wrap = document.querySelector(".map-wrap");
+    const hint = wrap.querySelector(".map-hint");
+    let detail = null;
+
+    // Swap in sharper borders plus US states the first time someone zooms in.
+    function loadDetail() {
+      detail = Promise.all([
+        d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json"),
+        d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3.0.1/states-10m.json"),
+      ]).then(([world50, us]) => {
+        landG.select(".land").attr("d", path(topojson.feature(world50, world50.objects.countries)));
+        statesG.append("path").attr("class", "states")
+          .attr("d", path(topojson.mesh(us, us.objects.states, (a, b) => a !== b)));
+      }).catch(() => {});
+    }
+
+    const zoom = d3.zoom()
+      .scaleExtent([1, 16])
+      .translateExtent([[0, 0], [W, H]])
+      .filter((event) => {
+        // Plain scrolling keeps scrolling the page; Ctrl/⌘ + scroll (or a trackpad pinch) zooms.
+        if (event.type === "wheel") return event.ctrlKey || event.metaKey;
+        // On touch, one finger scrolls the page until the map is zoomed in.
+        if (event.type.startsWith("touch")) return event.touches.length > 1 || d3.zoomTransform(svg.node()).k > 1;
+        return !event.button;
+      })
+      .on("zoom", ({ transform: t }) => {
+        zoomG.attr("transform", t);
+        // Keep dots and labels the same size on screen.
+        dots.forEach((d) => { const [px, py] = d.datum(); d.attr("transform", `translate(${px},${py}) scale(${1 / t.k})`); });
+        svg.style("touch-action", t.k > 1 ? "none" : "pan-y");
+        wrap.classList.toggle("zoomed", t.k > 1.01);
+        if (t.k >= 2 && !detail) loadDetail();
+      });
+
+    svg.call(zoom).on("dblclick.zoom", null);
+    svg.style("touch-action", "pan-y");
+
+    svg.node().addEventListener("wheel", (e) => {
+      if (e.ctrlKey || e.metaKey) return;
+      hint.classList.remove("flash"); void hint.offsetWidth; hint.classList.add("flash");
+    }, { passive: true });
+
+    wrap.querySelector("[data-zoom=in]").addEventListener("click", () => svg.transition().duration(350).call(zoom.scaleBy, 1.8));
+    wrap.querySelector("[data-zoom=out]").addEventListener("click", () => svg.transition().duration(350).call(zoom.scaleBy, 1 / 1.8));
+    wrap.querySelector("[data-zoom=reset]").addEventListener("click", () => svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity));
+    wrap.querySelector("[data-zoom=us]").addEventListener("click", () => {
+      // Frame the US stops: Iowa, Pennsylvania, Georgia.
+      // Frame the US legs, arcs included, with room for labels.
+      const boxes = [1, 2, 3].map((i) => routes[i].node().getBBox());
+      const x0 = d3.min(boxes, (b) => b.x) - 30, x1 = d3.max(boxes, (b) => b.x + b.width) + 30;
+      const y0 = d3.min(boxes, (b) => b.y) - 10, y1 = d3.max(boxes, (b) => b.y + b.height) + 25;
+      const k = Math.min(16, 0.85 / Math.max((x1 - x0) / W, (y1 - y0) / H));
+      const t = d3.zoomIdentity.translate(W / 2, H / 2).scale(k).translate(-(x0 + x1) / 2, -(y0 + y1) / 2);
+      svg.transition().duration(750).call(zoom.transform, t);
+    });
 
     const obs = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting) { play(); obs.disconnect(); }

@@ -40,14 +40,19 @@
   </div>
 
   <header class="nav">
-    <a href="#top" class="logo" aria-label="Back to top">K<span>B</span></a>
+    <a href="#top" class="logo" aria-label="Back to top">k<span>b</span></a>
+    <div class="views" role="tablist" aria-label="Site area">
+      <a href="#professional" data-view-link="professional" role="tab">Professional</a>
+      <a href="#personal" data-view-link="personal" role="tab">Personal</a>
+    </div>
     <nav class="tabs" aria-label="Sections">
-      <a href="#about">About</a>
-      <a href="#journey">Journey</a>
-      <a href="#interests">Interests</a>
-      <a href="#skills">Skills</a>
-      <a href="#projects">Projects</a>
-      <a href="#contact">Contact</a>
+      <a href="#about" data-view="professional">About</a>
+      <a href="#skills" data-view="professional">Skills</a>
+      <a href="#projects" data-view="professional">Projects</a>
+      <a href="#contact" data-view="professional">Contact</a>
+      <a href="#story" data-view="personal">Story</a>
+      <a href="#journey" data-view="personal">Journey</a>
+      <a href="#interests" data-view="personal">Interests</a>
     </nav>
     <button class="theme-toggle" id="themeToggle" role="switch" aria-checked="false" aria-label="Dark mode">
       <span class="track"><span class="thumb"></span></span>
@@ -62,31 +67,106 @@
       <canvas id="attractor" aria-hidden="true"></canvas>
       <div class="hero-text">
         <p class="eyebrow mono">// data engineer · aspiring polymath</p>
-        <h1>Kalpes<br>Bhandari</h1>
+        <h1>kalpes<br>bhandari</h1>
         <p class="lede">I build the data pipelines that let the rest of a business see clearly — and I'm endlessly curious about the math and physics underneath everything.</p>
         <div class="hero-links">
-          <a class="btn primary" href="#journey">My journey</a>
-          <a class="btn" href="#contact">Get in touch</a>
+          <a class="btn primary" href="#professional">Professional</a>
+          <a class="btn" href="#personal">Personal</a>
         </div>
       </div>
     </section>
 
-    <!-- ABOUT -->
+    <!-- ============ PROFESSIONAL ============ -->
+    <div class="view" id="professional" data-view="professional">
+    <!-- ABOUT (professional) -->
     <section id="about" class="section">
       <h2><span class="num mono">01</span> About</h2>
       <div class="about-grid">
         <div class="prose">
-          <p>I was born in Goldhap, Jhapa, Nepal, to Bhutanese-Nepali parents. In 2009 my family came to the United States as refugees and settled in Des Moines, Iowa.</p>
-          <p>I studied Management Information Systems at Iowa State University, where I got hooked on data — not just the numbers, but how good data quietly powers every other part of a business. Today I live in the Harrisburg, Pennsylvania area, work full-time as a <strong>data engineer</strong>, and study for a master's in analytics (OMSA) online at <strong>Georgia Tech</strong>.</p>
-          <p>I've always wanted to be a polymath. Physics and math pull me in the most, but I like learning a little about everything — more on that under <a href="#interests">Interests</a>.</p>
+          <p>I'm a <strong>data engineer</strong> based in the Harrisburg, Pennsylvania area. I build and maintain the pipelines that get data where it needs to go, working across Azure Data Factory, Snowflake, SQL, Python, and APIs.</p>
+          <p>I studied Management Information Systems at Iowa State University, where I got hooked on data — not just the numbers, but how good data quietly powers every other part of a business. Now I'm going deeper on the analytics side with a master's (OMSA) at <strong>Georgia Tech</strong>, online, alongside full-time work.</p>
         </div>
         <aside class="facts mono">
-          <p class="label">kalpes = {</p>
+          <p class="label">kalpes.work = {</p>
+          <dl>
+            <div><dt>role</dt><dd>"Data Engineer"</dd></div>
+            <div><dt>base</dt><dd>"Harrisburg, PA"</dd></div>
+            <div><dt>b.s.</dt><dd>"MIS, Iowa State"</dd></div>
+            <div><dt>m.s.</dt><dd>"OMSA, Georgia Tech"</dd></div>
+          </dl>
+          <p class="label">}</p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills" class="section">
+      <h2><span class="num mono">02</span> Skills</h2>
+      <div class="query">
+        <p class="mono q"><span class="kw">SELECT</span> skill, area <span class="kw">FROM</span> kalpes.toolkit;</p>
+        <table class="mono">
+          <thead><tr><th>skill</th><th>area</th></tr></thead>
+          <tbody>
+            <tr><td>Azure Data Factory</td><td>orchestration</td></tr>
+            <tr><td>Snowflake</td><td>warehouse</td></tr>
+            <tr><td>SQL</td><td>querying</td></tr>
+            <tr><td>Python</td><td>engineering</td></tr>
+            <tr><td>APIs</td><td>integration</td></tr>
+            <tr><td>Data engineering</td><td>pipelines</td></tr>
+            <tr><td>Data analytics</td><td>insight</td></tr>
+          </tbody>
+        </table>
+        <p class="mono rows">7 rows returned</p>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects" class="section">
+      <h2><span class="num mono">03</span> Projects</h2>
+      <div id="projectList" class="projects"></div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section contact">
+      <h2><span class="num mono">04</span> Contact</h2>
+      <div class="contact-grid">
+        <div>
+          <p class="prose">Have a question, an opportunity, or a data problem worth talking through? Send me a message and it'll land in my inbox.</p>
+          <div class="hero-links">
+            <a class="btn" href="https://www.linkedin.com/in/kalpes-bhandari/" target="_blank" rel="noopener">LinkedIn ↗</a>
+            <a class="btn" href="https://github.com/Kalpes-Bhandari" target="_blank" rel="noopener">GitHub ↗</a>
+          </div>
+        </div>
+        <form id="contactForm" class="form" novalidate>
+          <label>Name<input name="name" type="text" autocomplete="name" required maxlength="100"></label>
+          <label>Email<input name="email" type="email" autocomplete="email" required maxlength="200"></label>
+          <label>Message<textarea name="message" rows="5" required maxlength="5000"></textarea></label>
+          <!-- Honeypot: hidden from people, bots tend to fill it in -->
+          <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <button class="btn primary" type="submit">Send message</button>
+          <p class="form-status mono" id="formStatus" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+    </div>
+
+    <!-- ============ PERSONAL ============ -->
+    <div class="view" id="personal" data-view="personal">
+    <!-- STORY (personal) -->
+    <section id="story" class="section">
+      <h2><span class="num mono">01</span> My story</h2>
+      <div class="about-grid">
+        <div class="prose">
+          <p>I was born in Goldhap, Jhapa, Nepal, to Bhutanese-Nepali parents. In 2009 my family came to the United States as refugees and settled in Des Moines, Iowa. Today I call the Harrisburg, Pennsylvania area home.</p>
+          <p>I've always wanted to be a polymath. Physics and math pull me in the most, but I like learning a little about everything — science history, sports, TV, writing, and whatever else catches my curiosity.</p>
+        </div>
+        <aside class="facts mono">
+          <p class="label">kalpes.life = {</p>
           <dl>
             <div><dt>from</dt><dd>"Jhapa, Nepal"</dd></div>
+            <div><dt>since</dt><dd>2009, USA</dd></div>
             <div><dt>home</dt><dd>"Harrisburg, PA"</dd></div>
-            <div><dt>role</dt><dd>"Data Engineer"</dd></div>
-            <div><dt>study</dt><dd>"OMSA @ Georgia Tech"</dd></div>
+            <div><dt>hero</dt><dd>"Michael Faraday"</dd></div>
             <div><dt>fuel</dt><dd>"chai"</dd></div>
           </dl>
           <p class="label">}</p>
@@ -98,6 +178,13 @@
     <section id="journey" class="section">
       <h2><span class="num mono">02</span> Journey</h2>
       <div class="map-wrap">
+        <div class="map-controls">
+          <button type="button" data-zoom="in" aria-label="Zoom in">+</button>
+          <button type="button" data-zoom="out" aria-label="Zoom out">−</button>
+          <button type="button" data-zoom="us" aria-label="Zoom to the United States" class="txt">US</button>
+          <button type="button" data-zoom="reset" aria-label="Reset map" class="txt">⟲</button>
+        </div>
+        <p class="map-hint mono"><span class="fine">⌘/Ctrl + scroll to zoom · drag to pan</span><span class="coarse">pinch to zoom · two fingers to pan</span></p>
         <svg id="map" role="img" aria-label="World map tracing a path from Jhapa, Nepal to Des Moines and Ames, Iowa, then Harrisburg, Pennsylvania, with an online link to Georgia Tech in Atlanta"></svg>
       </div>
       <ol class="timeline">
@@ -143,13 +230,11 @@
       <div class="cards">
         <article class="card">
           <span class="icon">⚽</span>
-          <h3>Football / Soccer</h3>
-          <p>Real Madrid fan. Cristiano Ronaldo, Mesut Özil, and Luka Modrić were my guys.</p>
-        </article>
-        <article class="card">
-          <span class="icon">🏀</span>
-          <h3>Basketball</h3>
-          <p>Playing it, watching it, talking about it.</p>
+          <h3>Basketball &amp; Soccer</h3>
+          <ul class="list">
+            <li>Basketball: playing it, watching it, talking about it.</li>
+            <li>Soccer: Real Madrid fan. Cristiano Ronaldo, Mesut Özil, and Luka Modrić were my guys.</li>
+          </ul>
         </article>
         <article class="card">
           <span class="icon">✎</span>
@@ -175,7 +260,7 @@
           <h3>Math &amp; physics</h3>
           <p>The long goal: keep learning across fields and become a real polymath.</p>
         </article>
-        <article class="card wide">
+        <article class="card">
           <span class="icon">▶</span>
           <h3>TV shows</h3>
           <ul class="chips">
@@ -190,55 +275,7 @@
       </div>
     </section>
 
-    <!-- SKILLS -->
-    <section id="skills" class="section">
-      <h2><span class="num mono">04</span> Skills</h2>
-      <div class="query">
-        <p class="mono q"><span class="kw">SELECT</span> skill, area <span class="kw">FROM</span> kalpes.toolkit;</p>
-        <table class="mono">
-          <thead><tr><th>skill</th><th>area</th></tr></thead>
-          <tbody>
-            <tr><td>Azure Data Factory</td><td>orchestration</td></tr>
-            <tr><td>Snowflake</td><td>warehouse</td></tr>
-            <tr><td>SQL</td><td>querying</td></tr>
-            <tr><td>Python</td><td>engineering</td></tr>
-            <tr><td>APIs</td><td>integration</td></tr>
-            <tr><td>Data engineering</td><td>pipelines</td></tr>
-            <tr><td>Data analytics</td><td>insight</td></tr>
-          </tbody>
-        </table>
-        <p class="mono rows">7 rows returned</p>
-      </div>
-    </section>
-
-    <!-- PROJECTS -->
-    <section id="projects" class="section">
-      <h2><span class="num mono">05</span> Projects</h2>
-      <div id="projectList" class="projects"></div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact" class="section contact">
-      <h2><span class="num mono">06</span> Contact</h2>
-      <div class="contact-grid">
-        <div>
-          <p class="prose">Have a question, an opportunity, or just want to talk data, physics, or basketball? Send me a message and it'll land in my inbox.</p>
-          <div class="hero-links">
-            <a class="btn" href="https://www.linkedin.com/in/kalpes-bhandari/" target="_blank" rel="noopener">LinkedIn ↗</a>
-            <a class="btn" href="https://github.com/Kalpes-Bhandari" target="_blank" rel="noopener">GitHub ↗</a>
-          </div>
-        </div>
-        <form id="contactForm" class="form" novalidate>
-          <label>Name<input name="name" type="text" autocomplete="name" required maxlength="100"></label>
-          <label>Email<input name="email" type="email" autocomplete="email" required maxlength="200"></label>
-          <label>Message<textarea name="message" rows="5" required maxlength="5000"></textarea></label>
-          <!-- Honeypot: hidden from people, bots tend to fill it in -->
-          <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-          <button class="btn primary" type="submit">Send message</button>
-          <p class="form-status mono" id="formStatus" role="status" aria-live="polite"></p>
-        </form>
-      </div>
-    </section>
+    </div>
   </main>
 
   <footer class="footer mono">
