@@ -247,3 +247,29 @@ a.project:hover { border-color: var(--accent); transform: translateY(-2px); }
   html { scroll-behavior: auto; }
   * { transition: none !important; }
 }
+
+/* ---------- Contact form ---------- */
+#map .route.online { stroke-dasharray: 4 5; stroke-width: 1.4; }
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+.form {
+  display: grid; gap: 14px;
+  border: 1px solid var(--line); border-radius: 14px; padding: 22px; background: var(--bg-soft);
+}
+.form label { display: grid; gap: 6px; font-size: 0.85rem; color: var(--muted); }
+.form input, .form textarea {
+  font: inherit; font-size: 1rem; color: var(--text);
+  background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+  padding: 10px 12px; width: 100%; resize: vertical;
+  transition: border-color 0.2s;
+}
+.form input:focus, .form textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.form .hp { display: none; }
+.form button { justify-self: start; cursor: pointer; font: inherit; font-weight: 500; }
+.form button:disabled { opacity: 0.6; cursor: wait; }
+.form-status { margin: 0; font-size: 0.85rem; min-height: 1.2em; color: var(--muted); }
+.form-status.ok { color: var(--accent); }
+.form-status.err { color: #d33; }
+@media (max-width: 760px) {
+  .contact-grid { grid-template-columns: 1fr; gap: 28px; }
+  #map .route.online { stroke-width: 2.6; stroke-dasharray: 8 9; }
+}

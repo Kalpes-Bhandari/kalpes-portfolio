@@ -10,6 +10,14 @@
 // ---------------------------------------------------------------
 const PROJECTS = [];
 
+// ---------------------------------------------------------------
+// Contact form — messages are delivered by Web3Forms (free).
+// Get a key at https://web3forms.com by entering the email you want
+// messages sent to, then paste it here. The key is safe to publish:
+// it can only send mail to that one address.
+// ---------------------------------------------------------------
+const WEB3FORMS_KEY = "";
+
 const root = document.documentElement;
 
 // ---------- Theme toggle ----------
@@ -69,6 +77,58 @@ if (PROJECTS.length === 0) {
 }
 
 document.getElementById("year").textContent = new Date().getFullYear();
+
+// ---------- Contact form ----------
+(function contactForm() {
+  const form = document.getElementById("contactForm");
+  const status = document.getElementById("formStatus");
+  const button = form.querySelector("button");
+
+  function show(msg, kind) {
+    status.textContent = msg;
+    status.className = "form-status mono " + (kind || "");
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(form));
+    if (data.botcheck) return;
+    if (!data.name.trim() || !data.message.trim() || !form.email.checkValidity() || !data.email.trim()) {
+      show("Please fill in your name, a valid email, and a message.", "err");
+      return;
+    }
+    if (!WEB3FORMS_KEY) {
+      show("The form isn't connected yet — please reach out on LinkedIn.", "err");
+      return;
+    }
+
+    button.disabled = true;
+    show("sending…");
+    try {
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_KEY,
+          subject: `Portfolio message from ${data.name}`,
+          from_name: "Portfolio contact form",
+          name: data.name,
+          email: data.email,
+          replyto: data.email,
+          message: data.message,
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || json.success === false) throw new Error(json.message || res.statusText);
+      form.reset();
+      show("Message sent — thanks! I'll get back to you soon.", "ok");
+    } catch (err) {
+      show("Something went wrong sending that. Please try again or reach out on LinkedIn.", "err");
+    } finally {
+      button.disabled = false;
+    }
+  });
+})();
 
 // ---------- Lorenz attractor (hero) ----------
 (function lorenz() {
@@ -140,9 +200,12 @@ document.getElementById("year").textContent = new Date().getFullYear();
     { name: "Goldhap, Jhapa", sub: "NEPAL · born", coords: [87.73, 26.65], dx: 8, dy: 4, anchor: "start" },
     { name: "Des Moines", sub: "IOWA · 2009", coords: [-93.62, 41.59], dx: -8, dy: 14, anchor: "end" },
     { name: "Ames", sub: "IOWA STATE", coords: [-93.65, 42.03], dx: -8, dy: -12, anchor: "end" },
-    { name: "Atlanta", sub: "GEORGIA TECH", coords: [-84.4, 33.78], dx: 8, dy: 14, anchor: "start" },
+    { name: "Harrisburg", sub: "PA · home now", coords: [-76.88, 40.27], dx: 9, dy: -8, anchor: "start" },
+    { name: "Atlanta", sub: "GEORGIA TECH · online", coords: [-84.4, 33.78], dx: 8, dy: 16, anchor: "start" },
   ];
-  const legs = [[0, 1], [1, 2], [2, 3]];
+  // The last leg is the online link to Georgia Tech, drawn dashed.
+  const legs = [[0, 1], [1, 2], [2, 3], [3, 4]];
+  const HOME = 3, ONLINE_LEG = 3;
 
   const W = 960, H = 440;
   const svg = d3.select("#map").attr("viewBox", `0 0 ${W} ${H}`);
@@ -170,6 +233,7 @@ document.getElementById("year").textContent = new Date().getFullYear();
       const mx = (x1 + x2) / 2, my = Math.min(y1, y2) - lift;
       return routeG.append("path").attr("class", "route").attr("d", `M${x1},${y1} Q${mx},${my} ${x2},${y2}`);
     });
+    routes[ONLINE_LEG].classed("online", true);
 
     const dots = places.map((p) => {
       const [px, py] = projection(p.coords);
@@ -184,7 +248,8 @@ document.getElementById("year").textContent = new Date().getFullYear();
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     function play() {
-      routes.forEach((r) => {
+      routes.forEach((r, i) => {
+        if (i === ONLINE_LEG) { r.style("opacity", reduce ? 1 : 0); return; }
         const len = r.node().getTotalLength();
         r.attr("stroke-dasharray", `${len} ${len}`).attr("stroke-dashoffset", reduce ? 0 : len);
       });
@@ -194,13 +259,14 @@ document.getElementById("year").textContent = new Date().getFullYear();
       let delay = 500;
       legs.forEach(([, b], i) => {
         const dur = i === 0 ? 2200 : 900;
-        routes[i].transition().delay(delay).duration(dur).ease(d3.easeCubicInOut).attr("stroke-dashoffset", 0);
+        const tr = routes[i].transition().delay(delay).duration(dur).ease(d3.easeCubicInOut);
+        i === ONLINE_LEG ? tr.style("opacity", 1) : tr.attr("stroke-dashoffset", 0);
         dots[b].transition().delay(delay + dur - 100).duration(400).style("opacity", 1);
         delay += dur + 150;
       });
 
       // Gentle pulse on the current location.
-      const pulse = dots[3].select(".pulse");
+      const pulse = dots[HOME].select(".pulse");
       (function loop() {
         pulse.attr("r", 4).style("opacity", 0.9)
           .transition().delay(delay).duration(1600).attr("r", 16).style("opacity", 0)
