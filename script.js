@@ -29,7 +29,7 @@ function setTheme(theme, save) {
   if (save) {
     try { localStorage.setItem("theme", theme); } catch (e) {}
   }
-  if (window.redrawAttractor) window.redrawAttractor();
+  if (window.redrawHero) window.redrawHero();
 }
 
 setTheme(root.getAttribute("data-theme"), false);
@@ -172,66 +172,144 @@ document.getElementById("year").textContent = new Date().getFullYear();
   });
 })();
 
-// ---------- Lorenz attractor (hero) ----------
-(function lorenz() {
-  const canvas = document.getElementById("attractor");
+// ---------- Atom (hero) ----------
+// A 3D nucleus of protons and neutrons with electrons on tilted orbits.
+(function atom() {
+  const canvas = document.getElementById("atom");
   const ctx = canvas.getContext("2d");
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const STEPS = 9000;
-  const pts = [];
-  let x = 0.1, y = 0, z = 0;
-  const s = 10, r = 28, b = 8 / 3, dt = 0.006;
-  for (let i = 0; i < STEPS; i++) {
-    const dx = s * (y - x), dy = x * (r - z) - y, dz = x * y - b * z;
-    x += dx * dt; y += dy * dt; z += dz * dt;
-    pts.push([x, z]);
-  }
+  const css = (name) => getComputedStyle(root).getPropertyValue(name).trim();
 
-  let drawn = 0, raf = null;
+  // Nucleons spread on a few nested shells (Fibonacci sphere), alternating protons and neutrons.
+  const nucleons = [];
+  [[1, 0], [6, 0.55], [14, 1]].forEach(([n, r]) => {
+    for (let i = 0; i < n; i++) {
+      const y = n === 1 ? 0 : 1 - (2 * (i + 0.5)) / n;
+      const ring = Math.sqrt(1 - y * y), a = i * 2.39996;
+      nucleons.push({ p: [Math.cos(a) * ring * r, y * r, Math.sin(a) * ring * r], proton: nucleons.length % 2 === 0 });
+    }
+  });
 
+  // Three orbits, each tilted differently; electrons spaced around them.
+  const orbits = [
+    { tiltX: 1.15, tiltZ: 0.0, speed: 0.9, electrons: 2 },
+    { tiltX: 1.15, tiltZ: 2.09, speed: 0.75, electrons: 2 },
+    { tiltX: 1.15, tiltZ: 4.19, speed: 1.05, electrons: 2 },
+  ];
+
+  const rotX = (p, a) => [p[0], p[1] * Math.cos(a) - p[2] * Math.sin(a), p[1] * Math.sin(a) + p[2] * Math.cos(a)];
+  const rotY = (p, a) => [p[0] * Math.cos(a) + p[2] * Math.sin(a), p[1], -p[0] * Math.sin(a) + p[2] * Math.cos(a)];
+  const rotZ = (p, a) => [p[0] * Math.cos(a) - p[1] * Math.sin(a), p[0] * Math.sin(a) + p[1] * Math.cos(a), p[2]];
+
+  let W = 0, H = 0;
   function size() {
     const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
+    W = rect.width; H = rect.height;
+    canvas.width = W * dpr; canvas.height = H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    return rect;
   }
 
-  function draw(upTo) {
-    const rect = size();
-    const sc = rect.width / 58;
-    const cx = rect.width / 2, cy = rect.height * 0.95;
-    ctx.clearRect(0, 0, rect.width, rect.height);
-    ctx.strokeStyle = accent();
-    ctx.lineWidth = 0.7;
-    ctx.globalAlpha = 0.55;
-    ctx.beginPath();
-    for (let i = 0; i < upTo; i++) {
-      const px = cx + pts[i][0] * sc, py = cy - pts[i][1] * sc;
-      i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
-    }
-    ctx.stroke();
-    if (upTo > 0) {
-      const [lx, lz] = pts[upTo - 1];
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = accent();
+  function project(p, R) {
+    const f = 4; // camera distance in orbit radii; mild perspective
+    const s = f / (f + p[2]);
+    return [W / 2 + p[0] * R * s, H / 2 + p[1] * R * s, s];
+  }
+
+  function orbitPoint(o, t, spin) {
+    let p = [Math.cos(t), Math.sin(t), 0];
+    p = rotX(p, o.tiltX);
+    p = rotZ(p, o.tiltZ);
+    return rotY(p, spin);
+  }
+
+  function draw(time) {
+    const accent = css("--accent"), muted = css("--muted"), bg = css("--bg");
+    const R = Math.min(W, H) * 0.42;
+    const spin = time * 0.00012;
+    ctx.clearRect(0, 0, W, H);
+
+    // Orbit paths, split into back (behind nucleus) and front segments.
+    const segs = { back: [], front: [] };
+    orbits.forEach((o) => {
+      const N = 140;
+      for (let i = 0; i < N; i++) {
+        const a = orbitPoint(o, (i / N) * Math.PI * 2, spin), b = orbitPoint(o, ((i + 1) / N) * Math.PI * 2, spin);
+        ((a[2] + b[2]) / 2 > 0 ? segs.back : segs.front).push([project(a, R), project(b, R)]);
+      }
+    });
+    function strokeSegs(list, alpha) {
+      ctx.strokeStyle = accent; ctx.globalAlpha = alpha; ctx.lineWidth = 1.1;
       ctx.beginPath();
-      ctx.arc(cx + lx * sc, cy - lz * sc, 3, 0, Math.PI * 2);
-      ctx.fill();
+      list.forEach(([a, b]) => { ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); });
+      ctx.stroke();
     }
+
+    // Electrons, sorted with the nucleus by depth.
+    const electrons = [];
+    orbits.forEach((o, oi) => {
+      for (let e = 0; e < o.electrons; e++) {
+        const t = time * 0.001 * o.speed + (e / o.electrons) * Math.PI * 2 + oi;
+        electrons.push(orbitPoint(o, t, spin));
+      }
+    });
+    function drawElectron(p) {
+      const [x, y, s] = project(p, R);
+      ctx.globalAlpha = 1;
+      ctx.shadowColor = accent; ctx.shadowBlur = 14;
+      ctx.fillStyle = accent;
+      ctx.beginPath(); ctx.arc(x, y, 3.6 * s, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    // Faint probability-cloud halo.
+    ctx.globalAlpha = 1;
+    const halo = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, R * 1.1);
+    halo.addColorStop(0, accent + "22"); halo.addColorStop(1, accent + "00");
+    ctx.fillStyle = halo; ctx.fillRect(0, 0, W, H);
+
+    strokeSegs(segs.back, 0.22);
+    electrons.filter((p) => p[2] > 0).forEach(drawElectron);
+
+    // Nucleus: shaded spheres, back to front, gently wobbling.
+    const nr = R * 0.18, ballR = R * 0.072;
+    const nspin = time * 0.0004;
+    nucleons
+      .map((n, i) => {
+        const wob = reduce ? 0 : Math.sin(time * 0.003 + i) * 0.03;
+        let p = rotY(rotX(n.p, nspin * 0.7), nspin);
+        p = [p[0] * (1 + wob), p[1] * (1 + wob), p[2]];
+        return { p, proton: n.proton };
+      })
+      .sort((a, b) => b.p[2] - a.p[2])
+      .forEach(({ p, proton }) => {
+        const x = W / 2 + p[0] * nr, y = H / 2 + p[1] * nr, r = ballR * (1 - p[2] * 0.08);
+        const g = ctx.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.1, x, y, r);
+        const base = proton ? accent : muted;
+        g.addColorStop(0, "#ffffff"); g.addColorStop(0.25, base); g.addColorStop(1, base);
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = bg; ctx.globalAlpha = 0.5; ctx.lineWidth = 1;
+        ctx.stroke();
+      });
+
+    strokeSegs(segs.front, 0.55);
+    electrons.filter((p) => p[2] <= 0).forEach(drawElectron);
+    ctx.globalAlpha = 1;
   }
 
-  function animate() {
-    drawn = Math.min(STEPS, drawn + 40);
-    draw(drawn);
-    if (drawn < STEPS) raf = requestAnimationFrame(animate);
-  }
+  let running = false, raf = null;
+  function frame(t) { draw(t); if (running) raf = requestAnimationFrame(frame); }
+  function start() { if (running || reduce) return; running = true; raf = requestAnimationFrame(frame); }
+  function stop() { running = false; cancelAnimationFrame(raf); }
 
-  window.redrawAttractor = () => draw(drawn);
-  window.addEventListener("resize", () => draw(drawn));
-
-  if (reduce) { drawn = STEPS; draw(drawn); } else { animate(); }
+  size();
+  draw(2000);
+  window.redrawHero = () => { if (!running) draw(2000); };
+  window.addEventListener("resize", () => { size(); if (!running) draw(2000); });
+  // Only animate while the hero is on screen.
+  new IntersectionObserver((e) => (e[0].isIntersecting ? start() : stop())).observe(canvas);
 })();
 
 // ---------- Journey map ----------

@@ -124,7 +124,7 @@ h2 .num { font-size: 0.85rem; color: var(--accent); font-weight: 500; }
   position: relative; min-height: calc(100vh - 60px);
   display: flex; align-items: center;
 }
-#attractor {
+#atom {
   position: absolute; right: 0; top: 50%; transform: translateY(-50%);
   width: min(560px, 60%); aspect-ratio: 1; opacity: 0.85;
 }
@@ -264,7 +264,7 @@ a.project:hover { border-color: var(--accent); transform: translateY(-2px); }
   .tabs { margin-left: 0; flex: 1; }
   .tabs a { padding: 6px 9px; font-size: 0.85rem; }
   .hero { min-height: auto; padding-top: 48px; padding-bottom: 24px; flex-direction: column; align-items: stretch; }
-  #attractor { position: relative; transform: none; top: auto; width: 100%; max-width: 360px; margin: 0 auto 8px; order: -1; }
+  #atom { position: relative; transform: none; top: auto; width: 100%; max-width: 360px; margin: 0 auto 8px; order: -1; }
   .about-grid { grid-template-columns: 1fr; gap: 24px; }
   .feature { grid-template-columns: 1fr; gap: 24px; }
   .section { padding-top: 72px; }
