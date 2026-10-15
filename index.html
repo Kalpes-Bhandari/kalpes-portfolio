@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kalpes Bhandari</title>
+  <meta name="description" content="Kalpes Bhandari — data engineer, Georgia Tech analytics student, and aspiring polymath.">
+  <meta property="og:title" content="Kalpes Bhandari">
+  <meta property="og:description" content="Data engineer, Georgia Tech analytics student, and aspiring polymath.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23e5383b'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-size='40' text-anchor='middle' fill='white'%3E%E2%88%91%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    // Apply the saved or system theme before first paint to avoid a flash.
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem("theme"); } catch (e) {}
+      if (t !== "light" && t !== "dark") {
+        t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+<body>
+  <!-- Faint math / science glyphs scattered in the background -->
+  <div class="glyphs" aria-hidden="true">
+    <span style="top:12%;left:6%">∑</span>
+    <span style="top:22%;right:8%">∫ f(x) dx</span>
+    <span style="top:41%;left:3%">∇·E = ρ/ε₀</span>
+    <span style="top:55%;right:4%">π</span>
+    <span style="top:68%;left:9%">iħ ∂ψ/∂t = Ĥψ</span>
+    <span style="top:80%;right:10%">e<sup>iπ</sup> + 1 = 0</span>
+    <span style="top:92%;left:40%">∂</span>
+    <span style="top:33%;left:48%">λ</span>
+    <span style="top:74%;left:55%">∞</span>
+  </div>
+
+  <header class="nav">
+    <a href="#top" class="logo" aria-label="Back to top">K<span>B</span></a>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#about">About</a>
+      <a href="#journey">Journey</a>
+      <a href="#skills">Skills</a>
+      <a href="#projects">Projects</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <button class="theme-toggle" id="themeToggle" role="switch" aria-checked="false" aria-label="Dark mode">
+      <span class="track"><span class="thumb"></span></span>
+      <svg class="icon sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="icon moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero">
+      <canvas id="attractor" aria-hidden="true"></canvas>
+      <div class="hero-text">
+        <p class="eyebrow mono">// data engineer · aspiring polymath</p>
+        <h1>Kalpes<br>Bhandari</h1>
+        <p class="lede">I build the data pipelines that let the rest of a business see clearly — and I'm endlessly curious about the math and physics underneath everything.</p>
+        <div class="hero-links">
+          <a class="btn primary" href="#journey">My journey</a>
+          <a class="btn" href="#contact">Get in touch</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="section">
+      <h2><span class="num mono">01</span> About</h2>
+      <div class="about-grid">
+        <div class="prose">
+          <p>I was born in Goldhap, Jhapa, Nepal, to Bhutanese-Nepali parents. In 2009 my family came to the United States as refugees and settled in Des Moines, Iowa.</p>
+          <p>I studied Management Information Systems at Iowa State University, where I got hooked on data — not just the numbers, but how good data quietly powers every other part of a business. Today I work full-time as a <strong>data engineer</strong> and I'm pursuing a master's in analytics (OMSA) at <strong>Georgia Tech</strong>.</p>
+          <p>I've always wanted to be a polymath. Physics and math pull me in the most, but I like learning a little about everything.</p>
+        </div>
+        <aside class="interests">
+          <p class="mono label">interests = {</p>
+          <ul>
+            <li><span class="sym">∂</span> Physics</li>
+            <li><span class="sym">∑</span> Mathematics</li>
+            <li><span class="sym">●</span> Basketball</li>
+            <li><span class="sym">◎</span> Soccer</li>
+            <li><span class="sym">🦇</span> Batman &amp; superheroes</li>
+          </ul>
+          <p class="mono label">}</p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- JOURNEY -->
+    <section id="journey" class="section">
+      <h2><span class="num mono">02</span> Journey</h2>
+      <div class="map-wrap">
+        <svg id="map" role="img" aria-label="World map tracing a path from Jhapa, Nepal to Des Moines and Ames, Iowa, and Atlanta, Georgia"></svg>
+      </div>
+      <ol class="timeline">
+        <li><span class="when mono">Born</span><div><h3>Goldhap, Jhapa, Nepal</h3><p>Born to Bhutanese-Nepali parents.</p></div></li>
+        <li><span class="when mono">2009</span><div><h3>Des Moines, Iowa</h3><p>Arrived in the United States as a refugee.</p></div></li>
+        <li><span class="when mono">B.S.</span><div><h3>Iowa State University · Ames, Iowa</h3><p>Bachelor of Science in Management Information Systems.</p></div></li>
+        <li><span class="when mono">Now</span><div><h3>Georgia Tech · Atlanta, Georgia</h3><p>Master's in Analytics (OMSA), while working full-time as a data engineer.</p></div></li>
+      </ol>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills" class="section">
+      <h2><span class="num mono">03</span> Skills</h2>
+      <div class="query">
+        <p class="mono q"><span class="kw">SELECT</span> skill, area <span class="kw">FROM</span> kalpes.toolkit;</p>
+        <table class="mono">
+          <thead><tr><th>skill</th><th>area</th></tr></thead>
+          <tbody>
+            <tr><td>Azure Data Factory</td><td>orchestration</td></tr>
+            <tr><td>Snowflake</td><td>warehouse</td></tr>
+            <tr><td>SQL</td><td>querying</td></tr>
+            <tr><td>Python</td><td>engineering</td></tr>
+            <tr><td>APIs</td><td>integration</td></tr>
+            <tr><td>Data engineering</td><td>pipelines</td></tr>
+            <tr><td>Data analytics</td><td>insight</td></tr>
+          </tbody>
+        </table>
+        <p class="mono rows">7 rows returned</p>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects" class="section">
+      <h2><span class="num mono">04</span> Projects</h2>
+      <div id="projectList" class="projects"></div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section contact">
+      <h2><span class="num mono">05</span> Contact</h2>
+      <p class="prose">The best way to reach me is LinkedIn. You can also see what I'm building on GitHub.</p>
+      <div class="hero-links">
+        <a class="btn primary" href="https://www.linkedin.com/in/kalpes-bhandari/" target="_blank" rel="noopener">LinkedIn ↗</a>
+        <a class="btn" href="https://github.com/Kalpes-Bhandari" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer mono">
+    <span>© <span id="year"></span> Kalpes Bhandari</span>
+    <span>lim<sub>t→∞</sub> curiosity = ∞</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
